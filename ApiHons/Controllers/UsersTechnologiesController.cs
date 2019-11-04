@@ -28,14 +28,14 @@ namespace ApiHons.Controllers
             return await _context.UsersTechnologies.ToListAsync();
         }
 
-        // GET: api/UsersTechnologies/UserName
-        [HttpGet("{UserName}")]
-        public List<string> GetUsersTechnologies(string userName)
+        // GET: api/UsersTechnologies/userId
+        [HttpGet("{userId}")]
+        public List<string> GetUsersTechnologies(int userId)
         {
-            var userID = _context.Users.Where(x => x.FullName == userName).Select(x => x.UserId).FirstOrDefault();
-
+            //var userID = _context.Users.Where(x => x.FullName == userName).Select(x => x.UserId).FirstOrDefault();
+            
             //use id here
-            var techs = _context.UsersTechnologies.Where(x => x.UsersId == userID)
+            var techs = _context.UsersTechnologies.Where(x => x.UsersId == userId)
                 .Select(x => x.TechnologiesId).ToList();
 
             var techNames = _context.Technologies.Where(x => techs.Contains(x.TechnologyId)).ToList();
