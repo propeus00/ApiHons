@@ -10,7 +10,7 @@ namespace ApiHons.Models
         {
         }
 
-        public HonsProjContext(DbContextOptions<HonsProjContext> options)
+        public HonsProjContext(DbContextOptions options)
             : base(options)
         {
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using ApiHons.Models;
 using Microsoft.AspNetCore.Builder;
@@ -15,8 +16,11 @@ using Microsoft.Extensions.Options;
 
 namespace ApiHons
 {
+    
     public class Startup
     {
+        
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -27,7 +31,10 @@ namespace ApiHons
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<HonsProjContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:HonsProjDatabase"]));
+            
+            services.AddDbContext<HonsProjContext>(
+                options => options.UseSqlServer(Configuration["ConnectionStrings:HonsProjDatabase"])
+                );
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

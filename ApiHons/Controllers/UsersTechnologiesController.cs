@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ApiHons.Models;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.EntityFrameworkCore.Query.Expressions;
 
 namespace ApiHons.Controllers
 {
@@ -15,7 +17,7 @@ namespace ApiHons.Controllers
     public class UsersTechnologiesController : ControllerBase
     {
         private readonly HonsProjContext _context;
-
+       
         public UsersTechnologiesController(HonsProjContext context)
         {
             _context = context;
@@ -32,9 +34,8 @@ namespace ApiHons.Controllers
         [HttpGet("{userId}")]
         public List<string> GetUsersTechnologies(int userId)
         {
-            //var userID = _context.Users.Where(x => x.FullName == userName).Select(x => x.UserId).FirstOrDefault();
             
-            //use id here
+            
             var techs = _context.UsersTechnologies.Where(x => x.UsersId == userId)
                 .Select(x => x.TechnologiesId).ToList();
 
