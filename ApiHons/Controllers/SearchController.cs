@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApiHons.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiHons.Controllers
 {
@@ -11,36 +13,74 @@ namespace ApiHons.Controllers
     [ApiController]
     public class SearchController : ControllerBase
     {
-        // GET: api/Search
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly HonsProjContext _context;
+
+        public SearchController(HonsProjContext context)
         {
-            return new string[] { "value1", "value2" };
+            _context = context;
         }
 
-        // GET: api/Search/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+
+
+        // GET: api/Search/nameUsers
+        [HttpGet("{nameUser}")]
+        public async Task<ActionResult<List<UserInfo>>> GetSearch(string nameUser)
         {
-            return "value";
+            var users = await(from user in _context.Users
+                              where user.FullName.ToLower().Contains(nameUser)
+                              join projects in _context.Projects on user.UserId equals projects.UserId into totalNumberProjects
+                              select new UserInfo()
+                              {
+                                  UserId = user.UserId,
+                                  FullName = user.FullName,
+                                  Title = user.Title,
+                                  TotalProjectsNumber = totalNumberProjects.Count()
+                              }).ToListAsync();
+
+            //Ex [3,2,6],[8,4,2,1],[4,5,2,1,3]
+            var technologiesIdsLists = new List<IQueryable<int>>();
+            var technologiesNamesLists = new List<List<string>>();
+            var results = new List<UserInfo>();
+
+            foreach (var user in users)
+            {
+                IQueryable<int> usersTechnologiesId = from technology in _context.UsersTechnologies
+                                                      where technology.UsersId == user.UserId
+                                                      select technology.TechnologiesId;
+                technologiesIdsLists.Add(usersTechnologiesId);
+            }
+
+            foreach (var techIdsList in technologiesIdsLists)
+            {
+                var listTechnologies = new List<string>();
+                //[3,2,6]
+                foreach (var id in techIdsList)
+                {
+
+                    var techName = from techs in _context.Technologies
+                                   where techs.TechnologyId.Equals(id)
+                                   select techs.Name;
+                    //id:3 name:React / id:2 name:Django etc
+                    listTechnologies.Add(techName.First());
+                }
+                technologiesNamesLists.Add(listTechnologies);
+
+            }
+
+            int num = 0;
+            foreach (var user in users)
+            {
+                user.Skills = technologiesNamesLists[num];
+                num++;
+                results.Add(user);
+            }
+
+
+
+
+            return results;
         }
 
-        // POST: api/Search
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT: api/Search/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        
     }
 }
