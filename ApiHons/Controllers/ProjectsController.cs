@@ -14,14 +14,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ApiHons.Controllers
 {
-    public class UserInfo
-    {
-        public int UserId { get; set; }
-        public List<string> Skills { get; set; }
-        public string FullName { get; set; }
-        public string Title { get; set; }
-        public int TotalProjectsNumber { get; set; }
-    }
+    
     [Route("api/[controller]")]
     [ApiController]
     public class ProjectsController : ControllerBase
@@ -40,64 +33,7 @@ namespace ApiHons.Controllers
             return await _context.Projects.ToListAsync();
         }
 
-        // GET: api/Projects/nameUser
-        [HttpGet("{nameUser}")]
-        public async Task<ActionResult<List<UserInfo>>> GetProjects(string nameUser)
-        {
-
-            var users = await (from user in _context.Users
-                                where user.FullName.ToLower().Contains(nameUser)
-                                join projects in _context.Projects on user.UserId equals projects.UserId into totalNumberProjects
-                                select new UserInfo()
-                                            {
-                                                UserId = user.UserId,
-                                              FullName =user.FullName,
-                                               Title = user.Title,
-                                               TotalProjectsNumber = totalNumberProjects.Count()
-                                            }).ToListAsync();
-            //Ex [3,2,6],[8,4,2,1],[4,5,2,1,3]
-            var technologiesIdsLists = new List<IQueryable<int>>();
-            var technologiesNamesLists = new List<List<string>>();
-            var results = new List<UserInfo>();
-
-            foreach (var user in users)
-            {
-               IQueryable<int> usersTechnologiesId =  from technology in _context.UsersTechnologies
-                    where technology.UsersId == user.UserId
-                    select technology.TechnologiesId;
-               technologiesIdsLists.Add(usersTechnologiesId);
-            }
-
-            foreach (var techIdsList in technologiesIdsLists)
-            {
-                var listTechnologies = new List<string>();
-                //[3,2,6]
-                foreach (var id in techIdsList)
-                {
-                    
-                    var techName = from techs in _context.Technologies
-                        where techs.TechnologyId.Equals(id)
-                        select techs.Name;
-                    //id:3 name:React / id:2 name:Django etc
-                    listTechnologies.Add(techName.First());
-                }
-                technologiesNamesLists.Add(listTechnologies);
-
-            }
-
-            int num = 0;
-            foreach (var user in users)
-            {
-                user.Skills = technologiesNamesLists[num];
-                num++;
-                results.Add(user);
-            }
-
-           
-
-
-            return results;
-        }
+        
 
         // PUT: api/Projects/5
         [HttpPut("{id}")]

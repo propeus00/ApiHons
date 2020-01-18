@@ -9,6 +9,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApiHons.Controllers
 {
+    public class UserInfo
+    {
+        public int UserId { get; set; }
+        public List<string> Skills { get; set; }
+        public string FullName { get; set; }
+        public string Title { get; set; }
+        public int TotalProjectsNumber { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class SearchController : ControllerBase
@@ -39,7 +48,9 @@ namespace ApiHons.Controllers
 
             //Ex [3,2,6],[8,4,2,1],[4,5,2,1,3]
             var technologiesIdsLists = new List<IQueryable<int>>();
+            //Ex [React, html, php], [DJango, Laravel etc]
             var technologiesNamesLists = new List<List<string>>();
+
             var results = new List<UserInfo>();
 
             foreach (var user in users)
