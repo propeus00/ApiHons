@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApiHons.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ApiHons.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Query.Expressions;
@@ -14,16 +16,19 @@ using Newtonsoft.Json.Linq;
 
 namespace ApiHons.Controllers
 {
+  
     
     [Route("api/[controller]")]
     [ApiController]
     public class ProjectsController : ControllerBase
     {
         private readonly HonsProjContext _context;
+        private readonly IMapper _mapper;
 
-        public ProjectsController(HonsProjContext context)
+        public ProjectsController(HonsProjContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Projects
@@ -65,14 +70,22 @@ namespace ApiHons.Controllers
             return NoContent();
         }
 
-        // POST: api/Projects
-        [HttpPost]
-        public async Task<ActionResult<Projects>> PostProjects(Projects projects)
+        //POST: api/Projects
+       [HttpPost]
+        public async Task<ActionResult<Projects>> PostProjects( [FromBody] ProjectCreateDto createProject)
         {
-            _context.Projects.Add(projects);
+
+            // var finalProjectCreation = _mapper.Map<Entities.Projects>(createProject);
+            var finalProjectCreation = new Projects();
+            finalProjectCreation.Name = createProject.Name;
+            finalProjectCreation.Description = createProject.Description;
+            var userId = from user in _context.Users where user.FullName.ToLower() == createProject.UserName.ToLower() select user.UserId;
+            finalProjectCreation.UserId = userId.FirstOrDefault();
+
+            _context.Projects.Add(finalProjectCreation);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProjects", new { id = projects.ProjectId }, projects);
+            return CreatedAtAction("GetProjects", new { id = finalProjectCreation.ProjectId }, finalProjectCreation);
         }
 
         // DELETE: api/Projects/5

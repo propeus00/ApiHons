@@ -1,4 +1,5 @@
 ﻿using System;
+using ApiHons.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -20,6 +21,7 @@ namespace ApiHons.Models
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<UsersTechnologies> UsersTechnologies { get; set; }
 
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

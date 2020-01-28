@@ -3,21 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApiHons.Models;
+using ApiHons.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiHons.Controllers
 {
-    public class UserInfo
-    {
-        public int UserId { get; set; }
-        public List<string> Skills { get; set; }
-        public string FullName { get; set; }
-        public string Title { get; set; }
-        public int TotalProjectsNumber { get; set; }
-    }
-
+    
     [Route("api/[controller]")]
     [ApiController]
     public class SearchController : ControllerBase
@@ -33,12 +26,12 @@ namespace ApiHons.Controllers
 
         // GET: api/Search/nameUsers
         [HttpGet("{nameUser}")]
-        public async Task<ActionResult<List<UserInfo>>> GetSearch(string nameUser)
+        public async Task<ActionResult<List<SearchUserInfo>>> GetSearch(string nameUser)
         {
             var users = await(from user in _context.Users
                               where user.FullName.ToLower().Contains(nameUser)
                               join projects in _context.Projects on user.UserId equals projects.UserId into totalNumberProjects
-                              select new UserInfo()
+                              select new SearchUserInfo()
                               {
                                   UserId = user.UserId,
                                   FullName = user.FullName,
@@ -51,7 +44,7 @@ namespace ApiHons.Controllers
             //Ex [React, html, php], [DJango, Laravel etc]
             var technologiesNamesLists = new List<List<string>>();
 
-            var results = new List<UserInfo>();
+            var results = new List<SearchUserInfo>();
 
             foreach (var user in users)
             {
