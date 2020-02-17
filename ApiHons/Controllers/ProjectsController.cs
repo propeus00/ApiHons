@@ -79,7 +79,7 @@ namespace ApiHons.Controllers
             var finalProjectCreation = new Projects();
             finalProjectCreation.Name = createProject.Name;
             finalProjectCreation.Description = createProject.Description;
-            var userId = from user in _context.Users where user.FullName.ToLower() == createProject.UserName.ToLower() select user.UserId;
+            var userId = from user in _context.Users where user.FullName.ToLower().Contains(createProject.UserName.ToLower()) select user.UserId;
             finalProjectCreation.UserId = userId.FirstOrDefault();
 
             _context.Projects.Add(finalProjectCreation);
